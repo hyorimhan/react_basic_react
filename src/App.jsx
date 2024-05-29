@@ -1,37 +1,70 @@
 import { useState } from 'react';
-import './App.css';
 
 function App() {
-  const [count, setCount] = useState(0);
+  const [todos, setTodo] = useState('');
+  const [todoList, setTodoList] = useState([]);
 
-  function plusBtn() {
-    setCount(count + 1);
-  }
+  const todoValue = (e) => {
+    setTodo(e.target.value);
+  };
 
-  function minusBtn() {
-    setCount(count - 1);
-  }
+  const onSubmit = (e) => {
+    e.preventDefault();
+    const newTodo = {
+      todo: todos,
+      id: new Date().getTime(),
+      isDone: false,
+    };
+    if (todos === '') {
+      alert('값을 입력해주세요');
+    } else {
+      setTodoList([...todoList, newTodo]);
+      setTodo('');
+    }
+    console.log(newTodo);
+  };
 
-  function resetBtn() {
-    setCount(0);
-  }
+  const finBtn = (id) => {
+    setTodoList(
+      todoList.map((todo) => {
+        return todo.id === id ? { ...todo, isDone: !todo.isDone } : todo;
+      })
+    );
+  };
+
+  const delBtn = (id) => {
+    const filtered = todoList.filter((item) => {
+      return id !== item.id;
+    });
+    setTodoList(filtered);
+  };
+
   return (
     <>
-      <div className="container">
-        <div className="count">{count}</div>
-      </div>
-      <div className="container">
-        <div className="btn">
-          <button onClick={plusBtn} className="plus">
-            +
-          </button>
-          <button onClick={minusBtn} className="minus">
-            -
-          </button>
-          <button onClick={resetBtn} className="reset">
-            reset
-          </button>
-        </div>
+      <div>할 일 목록</div>
+      <form onSubmit={onSubmit}>
+        <input type="text" value={todos} onChange={todoValue} />
+        <button type="submit">추가</button>
+      </form>
+      <div>
+        <ul>
+          {todoList.map((item) => {
+            return (
+              <li
+                key={item.id}
+                style={{
+                  textDecoration: item.isDone ? 'line-through' : 'none',
+                }}
+              >
+                {item.todo}
+                <button onClick={() => finBtn(item.id)}>
+                  {item.isDone ? '취소' : '완료'}
+                </button>
+                <button onClick={() => delBtn(item.id)}>삭제</button>
+              </li>
+            );
+          })}
+        </ul>
       </div>
     </>
   );
